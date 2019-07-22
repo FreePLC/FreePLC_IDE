@@ -1,0 +1,6 @@
+
+                  <xsd:element name="FreePLCvM0">
+                    <xsd:complexType>
+                      %(toolchain_cloud)s
+                    </xsd:complexType>
+                  </xsd:element>

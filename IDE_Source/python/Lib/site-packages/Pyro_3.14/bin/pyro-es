@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+import sys
+from Pyro.EventService import Server
+Server.start(sys.argv[1:])

@@ -1,0 +1,104 @@
+msysCORE
+========================================================================
+msysCORE consists of the MSYS runtime plus the basic support files for
+a standard MSYS installation.
+
+Runtime requirements:
+  None.
+
+Runtime requirements for strace.exe (in -dbg)
+  gcc-core-4.4.0-mingw32-dll.tar.gz
+
+Build requirements:
+  MSYS Environment
+    msysCORE-1.0.13-1-msys-1.0.13-base-bin
+    bash-3.1.17-2-msys-1.0.11-bin
+    coreutils-5.97-2-msys-1.0.11-bin
+    diffutils-2.8.7.20071206cvs-2-msys-1.0.11-bin
+    findutils-4.4.2-1-msys-1.0.11-bin
+    gawk-3.1.7-1-msys-1.0.11-bin
+    grep-2.5.4-1-msys-1.0.11-bin
+    make-3.81-2-msys-1.0.11-bin
+    sed-4.2.1-1-msys-1.0.11-bin
+    tar-1.22-1-msys-1.0.11-bin
+    xz-4.999.9beta-1-msys-1.0.12-bin.tar.gz
+    liblzma-4.999.9beta-1-msys-1.0.12-dll-1.tar.gz
+    
+  MSYS DVLPR Toolchain (in /usr)
+    binutils-2.19.51-2-msys-1.0.12-bin
+    gcc-3.4.4-2-msys-1.0.12-bin
+    w32api-3.14-2-msys-1.0.12-dev
+    msysCORE-1.0.13-1-msys-1.0.13-dev.tar.bz2
+
+  MinGW Toolchain (in /mingw/bin)
+    binutils-2.19.1-mingw32-bin.tar.gz
+    gcc-core-4.4.0-mingw32-bin.tar.gz
+    gcc-core-4.4.0-mingw32-dll.tar.gz
+    gcc-c++-4.4.0-mingw32-bin.tar.gz
+    gcc-c++-4.4.0-mingw32-dll.tar.gz
+    mingwrt-3.17-mingw32-dev.tar.gz
+    mingwrt-3.17-mingw32-dll.tar.gz
+    w32api-3.14-mingw32-dev.tar.gz
+    gmp-4.2.4-mingw32-dll.tar.gz
+    mpfr-2.4.1-mingw32-dll.tar.gz
+
+Canonical homepage:
+  http://www.mingw.org/wiki/msys/
+
+Canonical download:
+  http://sourceforge.net/projects/mingw/files/
+
+License:
+  Cygwin (see /share/doc/MSYS/CYGWIN_LICENSE)
+
+Language:
+  C, C++
+
+========================================================================
+
+Build instructions:
+  unpack msysCORE-1.0.13-X-msys-1.0.13-src.tar.bz2
+  <path-to-source>/msysrlsbld
+See <path-to-source>/msysrlsbld -h for further options.
+
+This will create:
+
+  msysCORE-1.0.13-X-msys-1.0.13-bin.tar.lzma
+    MSYS runtime DLL plus the basic support files and documentation.    
+
+  msysCORE-1.0.13-X-msys-1.0.13-dev.tar.lzma
+    Development files for the MSYS runtime.
+
+  msysCORE-1.0.13-X-msys-1.0.13-dbg.tar.bz2
+    Debug information:
+    * msys-1.0-debug.dll - Debug version of the MSYS runtime.
+    * strace.exe - System call tracer for use with the above.
+    * msys-1.0.dll.dbg - Symbolic information for decoding stack dumps.
+
+========================================================================
+
+----------  msysCORE-1.0.13-2 -- 2010 Jan 27 -----------
+* Recompile at -O3 +:
+    -fno-unit-at-a-time
+  to avoid compiler optimization bug at -O3 and -O2
+
+----------  msysCORE-1.0.13-1 -- 2010 Jan 15 -----------
+* Updated MSYS to support runtime pseudo-relocs (see `info ld'
+  and search for --enable-runtime-pseudo-reloc). Both v1 and v2
+  relocations are supported.
+* Other changes necesssary to allow building with GCC 3.x rather
+  than the old 2.95.3 version.
+* Developer files are moved from within /usr/i686-pc-msys to
+  /usr/include and /usr/lib.
+* Fix a potential crash when preparing to run executables.
+* Fix bug #1249827 - MSYS appending Win32 path to hyphen.
+
+----------  msysCORE-1.0.12-1 -- 2010 Jan 5 -----------
+* Documentation moved to /share/doc/MSYS
+* MSYS symlink semantics are documented in /share/doc/MSYS/README.rtf
+* Improve symlink emulation:
+  - handle relative symlinks
+  - avoid infinite recursion
+  - correct return value on failure
+  - fail if destination exists
+* Better Win9x compatibility.

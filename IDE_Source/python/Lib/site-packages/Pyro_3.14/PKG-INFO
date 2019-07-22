@@ -1,0 +1,26 @@
+Metadata-Version: 1.0
+Name: Pyro
+Version: 3.14
+Summary: distributed object middleware for Python (IPC/RPC), version 3.x
+Home-page: http://www.xs4all.nl/~irmen/pyro3/
+Author: Irmen de Jong
+Author-email: irmen@razorvine.net
+License: MIT
+Description: Pyro stands for PYthon Remote Objects. It is an advanced and powerful Distributed Object Technology system written entirely in Python, that is designed to be very easy to use.
+        
+        This is version 3.x of Pyro, the stable version.
+        For a more modern version with new features, look at Pyro4 instead.
+Keywords: distributed objects,middleware,network communication,DOT,RMI,IPC
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Development Status :: 6 - Mature
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.5
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Topic :: Software Development :: Object Brokering
+Classifier: Topic :: System :: Distributed Computing
+Classifier: Topic :: System :: Networking

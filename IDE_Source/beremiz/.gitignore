@@ -1,0 +1,18 @@
+# Backup files #
+################
+*~
+
+# Directory files #
+###################
+*directory
+
+# Compiled source #
+###################
+*.a
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.py[ocd]
+*.so

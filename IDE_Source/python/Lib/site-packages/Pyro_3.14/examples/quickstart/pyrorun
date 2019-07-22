@@ -1,0 +1,151 @@
+#!/usr/bin/env python
+
+# by John Wiegley <johnw@gnu.org>
+#
+# This script can be used to quickly and easily export objects,
+# without tying them to Pyro at all.  It only requires a special
+# global function, named `remote_objects', which is used both to
+# construct the objects, and name them for the nameserver.
+#
+# NOTE: If your module must wait on a socket for input, you should
+# start that code in a thread, so that `pyrorun' occupies the main
+# thread.  Be sure also to make your thread as a daemon!  Otherwise,
+# the module won't shut down.  Here's an example:
+#
+#   from threading import Thread
+#
+#   def remote_objects():
+#       t = Thread(target = main)
+#       t.setDaemon(1)
+#       t.start()
+#       return { 'my_object': my_object() }
+
+import os
+import os.path
+import string
+import sys
+import time
+import types
+import Pyro.ext.remote as remote
+
+import Pyro.util
+
+Pyro.config.PYRO_MULTITHREADED = 0      # Default to simple, single-thraeded
+
+from getopt import getopt
+
+(opts, args) = getopt(sys.argv[1:], [],
+                      longopts = [ "this-host=", "this-port=",
+                                   "nameserver=", "ns-port=", "verbose",
+                                   "help", "multithreaded", "compress" ])
+
+true, false = 1, 0
+
+this_host = ''
+this_port = None
+nameserver = None
+ns_port    = None
+verbose    = false
+
+def usage():
+    print """usage: pyrorun [options] <modules ...>
+
+options are:
+    --help                Show this usage screen
+    --verbose             Be verbose about object remoting
+    --this-host HOST      Externally visible name for this host
+    --this-port PORT      The port that the objects are available on
+    --nameserver HOST     Use HOST as the Pyro nameserver
+    --ns-port PORT        Use PORT for the nameserver's port
+    --multithreaded       Enable Pyro's multi-threaded server code
+    --compressed          Enable compressed message transmission
+                          (Note: This is required on both sides)
+
+Every one of MODULES will be loaded, and a function named
+`remote_objects' within that module called.  This function should
+return a dictionary identifying the objects to be published.
+For example:
+
+    class Foo: pass
+    class Bar: pass
+    class Baz: pass
+
+    def remote_objects():
+        return { 'foo': Foo(),
+                 'bar': Bar(),
+                 'baz': Baz() }"""
+    sys.exit(0)
+
+for opt in opts:
+    if opt[0] == "--this-host":
+        this_host = opt[1]
+    elif opt[0] == "--this-port":
+        this_port = int(opt[1])
+    elif opt[0] == "--nameserver":
+        nameserver = opt[1]
+    elif opt[0] == "--ns-port":
+        ns_port = int(opt[1])
+    elif opt[0] == "--verbose":
+        verbose = remote.verbose = true
+    elif opt[0] == "--multithreaded":
+        Pyro.config.PYRO_MULTITHREADED = true
+    elif opt[0] == "--compress":
+        Pyro.config.PYRO_COMPRESSED = true
+    elif opt[0] == "--help":
+        usage()
+
+if len(args) == 0:
+    usage()
+
+class AttrToDict:
+    def __init__(self, dict):
+        self.dict = dict
+    def __hasattr__(self, item):
+        return self.dict.has_key(item)
+    def __getattr__(self, item):
+        return self.dict[item]
+
+remote_ready = false
+
+remote.daemon_host = this_host
+remote.daemon_port = this_port
+
+for module in args:
+    try:
+        if os.path.isfile(module):
+            globs = {}
+            execfile(module, globs)
+            mod = AttrToDict(globs)
+        else:
+            mod = __import__(module)
+            components = module.split('.')
+            for comp in components[1:]:
+                mod = getattr(mod, comp)
+    except:
+        sys.stderr.write("Failed to import %s: %s\n" %
+                         (module, sys.exc_value))
+    else:
+        if hasattr(mod, 'remote_objects'):
+            dict = mod.remote_objects()
+
+            if type(dict) is not types.DictType:
+                sys.stderr.write("`remote_objects' in %s does not "
+                                 "return a dictionary\n" % module)
+            else:
+                for name, obj in dict.items():
+                    if verbose:
+                        print "Remoting", name
+                    remote.provide_local_object(obj, name,
+                                                nameserver, ns_port)
+                    remote_ready = true
+        else:
+            sys.stderr.write("%s has no global function "
+                             "named `remote_objects'\n" % module)
+
+if remote_ready:
+    if verbose:
+        print "Waiting for requests..."
+    sys.exit(remote.handle_requests())
+else:
+    sys.stderr.write("There were no objects to remote!\n")
+    sys.exit(1)
